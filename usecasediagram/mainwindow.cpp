@@ -12,7 +12,9 @@ const int InsertTextButton = 10;
 //! [0]
 MainWindow::MainWindow()
 {
-	// создаём экшены
+	 QTextCodec *codec = QTextCodec::codecForName("CP1251");
+     QTextCodec::setCodecForTr(codec);
+    // создаём экшены
     createActions();
 
 	// createToolBox();
@@ -290,9 +292,11 @@ void MainWindow::itemSelected(QGraphicsItem *item)
 //! [20]
 void MainWindow::about()
 {
-    QMessageBox::about(this, tr("About Diagram Scene"),
-                       tr("The <b>Diagram Scene</b> example shows "
-                          "use of the graphics framework."));
+    QMessageBox::about(this, tr("usecase диаграмма"),
+        tr("Выполнили студенты группы ИВТ-460:"
+        "<p>Дмитриенко Д.В.</p>"
+        "<p>Рашевский Н.М.</p>"
+        "<p>Синицын А.А.</p>"));
 }
 //! [20]
 
@@ -368,65 +372,111 @@ void MainWindow::createToolBox()
 //! [23]
 void MainWindow::createActions()
 {
-    toFrontAction = new QAction(QIcon(":/images/bringtofront.png"),
+    /*toFrontAction = new QAction(QIcon(":/images/bringtofront.png"),
                                 tr("Bring to &Front"), this);
     toFrontAction->setShortcut(tr("Ctrl+F"));
     toFrontAction->setStatusTip(tr("Bring item to front"));
     connect(toFrontAction, SIGNAL(triggered()),
-            this, SLOT(bringToFront()));
+            this, SLOT(bringToFront()));*/
 //! [23]
 
-    sendBackAction = new QAction(QIcon(":/images/sendtoback.png"),
+    /*sendBackAction = new QAction(QIcon(":/images/sendtoback.png"),
                                  tr("Send to &Back"), this);
     sendBackAction->setShortcut(tr("Ctrl+B"));
     sendBackAction->setStatusTip(tr("Send item to back"));
     connect(sendBackAction, SIGNAL(triggered()),
-        this, SLOT(sendToBack()));
+        this, SLOT(sendToBack()));*/
 
     deleteAction = new QAction(QIcon(":/images/delete.png"),
-                               tr("&Delete"), this);
-    deleteAction->setShortcut(tr("Delete"));
-    deleteAction->setStatusTip(tr("Delete item from diagram"));
+                               tr("&Удалить"), this);
+    deleteAction->setShortcut(tr("Удалить"));
+    deleteAction->setStatusTip(tr("Удалить элемент с диаграммы"));
     connect(deleteAction, SIGNAL(triggered()),
         this, SLOT(deleteItem()));
 
-    exitAction = new QAction(tr("E&xit"), this);
+    exitAction = new QAction(tr("Выход"), this);
     exitAction->setShortcuts(QKeySequence::Quit);
-    exitAction->setStatusTip(tr("Quit Scenediagram example"));
+    exitAction->setStatusTip(tr("Выход из редактора"));
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
 
-    boldAction = new QAction(tr("Bold"), this);
+    /*boldAction = new QAction(tr("Bold"), this);
     boldAction->setCheckable(true);
     QPixmap pixmap(":/images/bold.png");
     boldAction->setIcon(QIcon(pixmap));
     boldAction->setShortcut(tr("Ctrl+B"));
     connect(boldAction, SIGNAL(triggered()),
-            this, SLOT(handleFontChange()));
+            this, SLOT(handleFontChange()));*/
 
-    italicAction = new QAction(QIcon(":/images/italic.png"),
+    /*italicAction = new QAction(QIcon(":/images/italic.png"),
                                tr("Italic"), this);
     italicAction->setCheckable(true);
     italicAction->setShortcut(tr("Ctrl+I"));
     connect(italicAction, SIGNAL(triggered()),
-            this, SLOT(handleFontChange()));
+            this, SLOT(handleFontChange()));*/
 
-    underlineAction = new QAction(QIcon(":/images/underline.png"),
+    /*underlineAction = new QAction(QIcon(":/images/underline.png"),
                                   tr("Underline"), this);
     underlineAction->setCheckable(true);
     underlineAction->setShortcut(tr("Ctrl+U"));
     connect(underlineAction, SIGNAL(triggered()),
-            this, SLOT(handleFontChange()));
+            this, SLOT(handleFontChange()));*/
 
-    aboutAction = new QAction(tr("A&bout"), this);
+    aboutAction = new QAction(tr("О программе"), this);
     aboutAction->setShortcut(tr("Ctrl+B"));
     connect(aboutAction, SIGNAL(triggered()),
             this, SLOT(about()));
-
-	DiagramItem item(DiagramItem::Step, itemMenu);
-	QIcon icon(item.image());
-	this->rectAction = new QAction(icon,tr("Rect"),this);
+    //все пока коннектятся к Rect
+    //вариант использования(бывший Rect)
+	//DiagramItem item(DiagramItem::Step, itemMenu);
+	//QIcon icon(item.image());
+	this->rectAction = new QAction(QIcon(":/images/usecase.png"),tr("Вариант использования"),this);
 	connect(rectAction, SIGNAL(triggered()),
 		this, SLOT(on_rectAction()));
+    
+    //участники
+
+    this->actorAction = new QAction(QIcon(":/images/actor.png"),tr("Участник"),this);
+	connect(actorAction, SIGNAL(triggered()),
+		this, SLOT(on_actorAction()));
+    
+    //комментарии
+
+    this->commAction = new QAction(QIcon(":/images/comment.png"),tr("Комментарий"),this);
+	connect(commAction, SIGNAL(triggered()),
+		this, SLOT(on_commAction()));
+    
+    //картинка вставляемая
+
+    this->picAction = new QAction(QIcon(":/images/pic.png"),tr("Изображение"),this);
+	connect(picAction, SIGNAL(triggered()),
+		this, SLOT(on_picAction()));
+
+    //сохранение в картинку
+
+    this->saveToPicAction = new QAction(tr("Сохранить в картинку..."),this);
+	connect(saveToPicAction, SIGNAL(triggered()),
+		this, SLOT(on_saveToPicAction()));
+
+    //сохранить
+    saveAction = new QAction(tr("Сохранить"), this);
+    saveAction->setShortcut(tr("Ctrl+S"));
+    connect(saveAction, SIGNAL(triggered()),
+            this, SLOT(on_saveAction()));
+    //сохранить как
+    saveAsAction = new QAction(tr("Сохранить как..."), this);
+    saveAsAction->setShortcut(tr("Ctrl+Alt+B"));
+    connect(saveAsAction, SIGNAL(triggered()),
+            this, SLOT(on_saveAsAction()));
+    //открыть
+    openAction = new QAction(tr("Открыть..."), this);
+    openAction->setShortcut(tr("Ctrl+O"));
+    connect(openAction, SIGNAL(triggered()),
+            this, SLOT(on_openAction()));
+    //создать
+    createAction = new QAction(tr("Создать"), this);
+    createAction->setShortcut(tr("Ctrl+N"));
+    connect(createAction, SIGNAL(triggered()),
+            this, SLOT(on_createAction()));
 }
 void MainWindow::on_rectAction()
 {
@@ -441,19 +491,83 @@ void MainWindow::on_rectAction()
 		scene->setMode(DiagramScene::InsertItem);
 	}
 }
+void MainWindow::on_actorAction()
+{
+	int id = 0;
+	if (id == InsertTextButton)
+	{
+		scene->setMode(DiagramScene::InsertText);
+	}
+	else 
+	{
+		scene->setItemType(DiagramItem::Step);
+		scene->setMode(DiagramScene::InsertItem);
+	}
+}
+void MainWindow::on_commAction()
+{
+	int id = 0;
+	if (id == InsertTextButton)
+	{
+		scene->setMode(DiagramScene::InsertText);
+	}
+	else 
+	{
+		scene->setItemType(DiagramItem::Step);
+		scene->setMode(DiagramScene::InsertItem);
+	}
+}
+void MainWindow::on_picAction()
+{
+	int id = 0;
+	if (id == InsertTextButton)
+	{
+		scene->setMode(DiagramScene::InsertText);
+	}
+	else 
+	{
+		scene->setItemType(DiagramItem::Step);
+		scene->setMode(DiagramScene::InsertItem);
+	}
+}
+void MainWindow::on_saveToPicAction()
+{
+	
+}
+void MainWindow::on_saveAction()
+{
+	
+}
+void MainWindow::on_saveAsAction()
+{
+	
+}
+void MainWindow::on_openAction()
+{
+	
+}
+void MainWindow::on_createAction()
+{
+	
+}
 //! [24]
 void MainWindow::createMenus()
 {
-    fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu = menuBar()->addMenu(tr("&Файл"));
+    fileMenu->addAction(createAction);
+    fileMenu->addAction(openAction);
+    fileMenu->addAction(saveAction);
+    fileMenu->addAction(saveAsAction);
+    fileMenu->addAction(saveToPicAction);
     fileMenu->addAction(exitAction);
 
-    itemMenu = menuBar()->addMenu(tr("&Item"));
+   /* itemMenu = menuBar()->addMenu(tr("&Item"));
     itemMenu->addAction(deleteAction);
     itemMenu->addSeparator();
     itemMenu->addAction(toFrontAction);
-    itemMenu->addAction(sendBackAction);
+    itemMenu->addAction(sendBackAction);*/
 
-    aboutMenu = menuBar()->addMenu(tr("&Help"));
+    aboutMenu = menuBar()->addMenu(tr("&Помощь"));
     aboutMenu->addAction(aboutAction);
 }
 //! [24]
@@ -462,10 +576,45 @@ void MainWindow::createMenus()
 void MainWindow::createToolbars()
 {
 //! [25]
-    editToolBar = addToolBar(tr("Edit"));
+
+    QToolButton *pointerButton = new QToolButton;
+    pointerButton->setCheckable(true);
+    pointerButton->setChecked(true);
+    pointerButton->setIcon(QIcon(":/images/pointer.png"));
+    
+    QToolButton *linePointerButton = new QToolButton;
+    linePointerButton->setCheckable(true);
+    linePointerButton->setIcon(QIcon(":/images/linepointer.png"));
+
+    pointerTypeGroup = new QButtonGroup(this);
+    pointerTypeGroup->addButton(pointerButton, int(DiagramScene::MoveItem));
+    pointerTypeGroup->addButton(linePointerButton,
+                                int(DiagramScene::InsertLine));
+    connect(pointerTypeGroup, SIGNAL(buttonClicked(int)),
+            this, SLOT(pointerGroupClicked(int)));
+
+    sceneScaleCombo = new QComboBox;
+    QStringList scales;
+    scales << tr("50%") << tr("75%") << tr("100%") << tr("125%") << tr("150%");
+    sceneScaleCombo->addItems(scales);
+    sceneScaleCombo->setCurrentIndex(2);
+    connect(sceneScaleCombo, SIGNAL(currentIndexChanged(QString)),
+            this, SLOT(sceneScaleChanged(QString)));
+
+
+
+    editToolBar = addToolBar(tr("Редактирование"));
+    editToolBar->addWidget(pointerButton);
     editToolBar->addAction(deleteAction);
-    editToolBar->addAction(toFrontAction);
-    editToolBar->addAction(sendBackAction);
+    editToolBar->addWidget(linePointerButton);
+    editToolBar->addAction(this->rectAction);
+    editToolBar->addAction(this->actorAction);
+    editToolBar->addAction(this->commAction);
+    editToolBar->addAction(this->picAction);
+    editToolBar->addWidget(sceneScaleCombo);
+	
+    //editToolBar->addAction(toFrontAction);
+    //editToolBar->addAction(sendBackAction);
 	/*
     fontCombo = new QFontComboBox();
     connect(fontCombo, SIGNAL(currentFontChanged(QFont)),
@@ -533,34 +682,11 @@ void MainWindow::createToolbars()
 	//colorToolBar->addWidget(fillColorToolButton);
 	//colorToolBar->addWidget(lineColorToolButton);
 
-    QToolButton *pointerButton = new QToolButton;
-    pointerButton->setCheckable(true);
-    pointerButton->setChecked(true);
-    pointerButton->setIcon(QIcon(":/images/pointer.png"));
-    QToolButton *linePointerButton = new QToolButton;
-    linePointerButton->setCheckable(true);
-    linePointerButton->setIcon(QIcon(":/images/linepointer.png"));
-
-    pointerTypeGroup = new QButtonGroup(this);
-    pointerTypeGroup->addButton(pointerButton, int(DiagramScene::MoveItem));
-    pointerTypeGroup->addButton(linePointerButton,
-                                int(DiagramScene::InsertLine));
-    connect(pointerTypeGroup, SIGNAL(buttonClicked(int)),
-            this, SLOT(pointerGroupClicked(int)));
-
-    sceneScaleCombo = new QComboBox;
-    QStringList scales;
-    scales << tr("50%") << tr("75%") << tr("100%") << tr("125%") << tr("150%");
-    sceneScaleCombo->addItems(scales);
-    sceneScaleCombo->setCurrentIndex(2);
-    connect(sceneScaleCombo, SIGNAL(currentIndexChanged(QString)),
-            this, SLOT(sceneScaleChanged(QString)));
-
-    pointerToolbar = addToolBar(tr("Pointer type"));
-    pointerToolbar->addWidget(pointerButton);
-    pointerToolbar->addWidget(linePointerButton);
+    //pointerToolbar = addToolBar(tr("Pointer type"));
+   // pointerToolbar->addWidget(pointerButton);
+    //pointerToolbar->addWidget(linePointerButton);
     //pointerToolbar->addWidget(sceneScaleCombo);
-	pointerToolbar->addAction(this->rectAction);
+	//pointerToolbar->addAction(this->rectAction);
 	/// добавление виджетов в тулбар для добавления элемента
 
 

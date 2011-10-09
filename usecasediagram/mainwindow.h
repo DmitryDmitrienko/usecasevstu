@@ -51,7 +51,16 @@ private slots:
     void handleFontChange();
     void itemSelected(QGraphicsItem *item);
     void about();
+    //
 	void on_rectAction();
+    void on_actorAction();
+    void on_commAction();
+    void on_picAction();
+    void on_saveToPicAction();
+    void on_saveAction();
+    void on_saveAsAction();
+    void on_openAction();
+    void on_createAction();
 
 private:
     void createToolBox();
@@ -105,7 +114,18 @@ private:
     QAction *textAction;
     QAction *fillAction;
     QAction *lineAction;
-	QAction *rectAction;
+	
+    
+    QAction *rectAction;//вариант использования(овал)
+    QAction *actorAction;//участник(человечек)
+    QAction *commAction;//комментарий
+    QAction *picAction;//картинка вставляемая
+    QAction *saveToPicAction;//сохранение в картинку
+    QAction *saveAction;//сохраненить
+    QAction *saveAsAction;//сохраненить как
+    QAction *openAction;//открыть
+    QAction *createAction;//создать
+
 };
 //! [0]
 
