@@ -488,16 +488,9 @@ void MainWindow::on_rectAction()
 }
 void MainWindow::on_actorAction()
 {
-	int id = 0;
-	if (id == InsertTextButton)
-	{
-		scene->setMode(DiagramScene::InsertText);
-	}
-	else 
-	{
-		scene->setItemType(DiagramItem::Step);
-		scene->setMode(DiagramScene::InsertItem);
-	}
+	scene->setItemType(DiagramItem::Step);
+	scene->setMode(DiagramScene::InsertActor);
+	
 }
 void MainWindow::on_commAction()
 {

@@ -15,6 +15,7 @@ DiagramScene::DiagramScene(QMenu *itemMenu, QObject *parent)
     myItemColor = Qt::white;
     myTextColor = Qt::black;
     myLineColor = Qt::black;
+   
 }
 //! [0]
 
@@ -143,6 +144,13 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
             textItem->setDefaultTextColor(myTextColor);
             textItem->setPos(mouseEvent->scenePos());
             emit textInserted(textItem);
+            break;
+             case InsertActor:
+                 this->actorImageItem = new DiagramActorImageItem(QImage(":/images/actor.png"));
+			//actorImageItem->setZValue(1000.0);
+			addItem(actorImageItem);
+			actorImageItem->setPos(mouseEvent->scenePos());
+            break;
 //! [8] //! [9]
     default:
         ;
