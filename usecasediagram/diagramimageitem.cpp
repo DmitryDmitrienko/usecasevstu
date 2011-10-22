@@ -18,7 +18,7 @@ DiagramImageItem::DiagramImageItem(QImage img)
      pixmap.convertFromImage(image, Qt::OrderedAlphaDither);
  #endif
 }
-void DiagramImageItem::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget * )
+void DiagramImageItem::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget * widget)
  {
  // On Qt/Embedded, we can paint a QImage as fast as a QPixmap,
  // but on other platforms, we need to use a QPixmap.
@@ -27,5 +27,6 @@ void DiagramImageItem::paint( QPainter *p, const QStyleOptionGraphicsItem *optio
  #else
      p->drawPixmap( option->exposedRect, pixmap, option->exposedRect );
  #endif
+      QGraphicsRectItem::paint(p,option,widget);
  }
 
