@@ -321,87 +321,10 @@ class Actor(ElementDiagramm):
     def polygon(self):
         return QtGui.QPolygonF(self.boundingRect())
 
-class DiagramItem(QtGui.QGraphicsPolygonItem):
-    Step, Conditional, StartEnd, Io = range(4)
-
-    def __init__(self, diagramType, contextMenu, parent=None, scene=None):
-        super(DiagramItem, self).__init__(parent, scene)
-
-        self.arrows = []
-
-        self.diagramType = diagramType
-        self.myContextMenu = contextMenu
-
-        path = QtGui.QPainterPath()
-        if self.diagramType == self.StartEnd:
-            path.moveTo(200, 50)
-            path.arcTo(150, 0, 50, 50, 0, 90)
-            path.arcTo(50, 0, 50, 50, 90, 90)
-            path.arcTo(50, 50, 50, 50, 180, 90)
-            path.arcTo(150, 50, 50, 50, 270, 90)
-            path.lineTo(200, 25)
-            self.myPolygon = path.toFillPolygon()
-        elif self.diagramType == self.Conditional:
-            self.myPolygon = QtGui.QPolygonF([
-                    QtCore.QPointF(-100, 0), QtCore.QPointF(0, 100),
-                    QtCore.QPointF(100, 0), QtCore.QPointF(0, -100),
-                    QtCore.QPointF(-100, 0)])
-        elif self.diagramType == self.Step:
-            self.myPolygon = QtGui.QPolygonF([
-                    QtCore.QPointF(-100, -100), QtCore.QPointF(100, -100),
-                    QtCore.QPointF(100, 100), QtCore.QPointF(-100, 100),
-                    QtCore.QPointF(-100, -100)])
-        else:
-            self.myPolygon = QtGui.QPolygonF([
-                    QtCore.QPointF(-120, -80), QtCore.QPointF(-70, 80),
-                    QtCore.QPointF(120, 80), QtCore.QPointF(70, -80),
-                    QtCore.QPointF(-120, -80)])
-
-        self.setPolygon(self.myPolygon)
-        self.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
-        self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
-
-    def removeArrow(self, arrow):
-        try:
-            self.arrows.remove(arrow)
-        except ValueError:
-            pass
-
-    def removeArrows(self):
-        for arrow in self.arrows[:]:
-            arrow.startItem().removeArrow(arrow)
-            arrow.endItem().removeArrow(arrow)
-            self.scene().removeItem(arrow)
-
-    def addArrow(self, arrow):
-        self.arrows.append(arrow)
-
-    def image(self):
-        pixmap = QtGui.QPixmap(250, 250)
-        pixmap.fill(QtCore.Qt.transparent)
-        painter = QtGui.QPainter(pixmap)
-        painter.setPen(QtGui.QPen(QtCore.Qt.black, 8))
-        painter.translate(125, 125)
-        painter.drawPolyline(self.myPolygon)
-        return pixmap
-
-    def contextMenuEvent(self, event):
-        self.scene().clearSelection()
-        self.setSelected(True)
-        self.myContextMenu.exec_(event.screenPos())
-
-    def itemChange(self, change, value):
-        if change == QtGui.QGraphicsItem.ItemPositionChange:
-            for arrow in self.arrows:
-                arrow.updatePosition()
-
-        return value
-
-
 class DiagramScene(QtGui.QGraphicsScene):
     InsertItem, InsertLine, InsertText, MoveItem,InsertCommentLine,InsertUseCase,InsertArrowAssociation,InsertArrowGeneralization,InsertActor  = range(9)
 
-    itemInserted = QtCore.Signal(DiagramItem)
+    itemInserted = QtCore.Signal(ElementDiagramm)
 
     textInserted = QtCore.Signal(QtGui.QGraphicsTextItem)
 
@@ -412,7 +335,7 @@ class DiagramScene(QtGui.QGraphicsScene):
 
         self.myItemMenu = itemMenu
         self.myMode = self.MoveItem
-        self.myItemType = DiagramItem.Step
+        #self.myItemType = DiagramItem.Step
         self.line = None
         self.textItem = None
         self.myItemColor = QtCore.Qt.white
@@ -435,7 +358,7 @@ class DiagramScene(QtGui.QGraphicsScene):
 
     def setItemColor(self, color):
         self.myItemColor = color
-        if self.isItemChange(DiagramItem):
+        if self.isItemChange(ElementDiagram):
             item = self.selectedItems()[0]
             item.setBrush(self.myItemColor)
 
@@ -465,7 +388,7 @@ class DiagramScene(QtGui.QGraphicsScene):
             return
 
         if self.myMode == self.InsertItem  :
-            item = DiagramItem(self.myItemType, self.myItemMenu)
+            item = ElementDiagramm(self.myItemType, self.myItemMenu)
             item.setBrush(self.myItemColor)
             self.addItem(item)
             item.setPos(mouseEvent.scenePos())
@@ -606,8 +529,9 @@ class MainWindow(QtGui.QMainWindow):
 
     def deleteItem(self):
         for item in self.scene.selectedItems():
-            if isinstance(item, DiagramItem):
-                item.removeArrows()
+            if isinstance(item, ElementDiagramm):
+				pass
+                #item.removeArrows()
             self.scene.removeItem(item)
 
     def pointerGroupClicked(self, i):
@@ -622,7 +546,7 @@ class MainWindow(QtGui.QMainWindow):
 
         zValue = 0
         for item in overlapItems:
-            if (item.zValue() >= zValue and isinstance(item, DiagramItem)):
+            if (item.zValue() >= zValue and isinstance(item, ElementDiagramm)):
                 zValue = item.zValue() + 0.1
         selectedItem.setZValue(zValue)
 
@@ -635,7 +559,7 @@ class MainWindow(QtGui.QMainWindow):
 
         zValue = 0
         for item in overlapItems:
-            if (item.zValue() <= zValue and isinstance(item, DiagramItem)):
+            if (item.zValue() <= zValue and isinstance(item, ElementDiagramm)):
                 zValue = item.zValue() - 0.1
         selectedItem.setZValue(zValue)
 
