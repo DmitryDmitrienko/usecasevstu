@@ -24,6 +24,7 @@ class TotalLineDiagram(QtGui.QGraphicsLineItem):
          self.myColor = QtCore.Qt.black
          self.setPen(QtGui.QPen(self.myColor, 2, QtCore.Qt.SolidLine,
                 QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+         self.arrowsComment = []
 
      def boundingRect(self):
         extra = (self.pen().width() + 20) / 2.0
@@ -55,18 +56,25 @@ class TotalLineDiagram(QtGui.QGraphicsLineItem):
          pass
      def polygon(self):
          return QtGui.QPolygonF(self.boundingRect())
+     def addArrowComment(self,item):
+         self.arrowsComment.append(item)
+         
 # клас для отрисовки линии комментария
 class CommentLine(TotalLineDiagram):
     def __init__(self, startItem, endItem, parent=None, scene=None):
         super(CommentLine,self).__init__(startItem,endItem,parent,scene)
 
     def isValid(self):
-        pass
+        if((isinstance(self.startItem(),Comment) and \
+            isinstance(self.endItem(), TotalLineDiagram)) or \
+            (isinstance(self.startItem(), TotalLineDiagram) and \
+            isinstance(self.endItem(), Comment))):
+            return True
+        else: return False
 
     def paint(self, painter, option, widget=None):
         if (self.myStartItem.collidesWithItem(self.myEndItem)):
             return
-
         myStartItem = self.myStartItem
         myEndItem = self.myEndItem
         myColor = self.myColor
@@ -126,7 +134,18 @@ class ArrowAssociation(TotalLineDiagram):
         super(ArrowAssociation,self).__init__(startItem,endItem,parent,scene)
 
     def isValid(self):
-        pass
+        if((isinstance(self.startItem(),Actor) and \
+            isinstance(self.endItem(), UseCase)) or \
+            (isinstance(self.startItem(), UseCase) and \
+            isinstance(self.endItem(), Actor))):
+            return True
+        elif ((isinstance(self.startItem(),Actor) and \
+            isinstance(self.endItem(), Actor))):
+            return True
+        elif ((isinstance(self.startItem(),UseCase) and \
+            isinstance(self.endItem(), UseCase))):
+            return True
+        else: return False
 
     def paint(self, painter, option, widget=None):
         if (self.myStartItem.collidesWithItem(self.myEndItem)):
@@ -143,7 +162,7 @@ class ArrowAssociation(TotalLineDiagram):
 
         centerLine = QtCore.QLineF(myStartItem.pos(), myEndItem.pos())
         endPolygon = myEndItem.polygon()
-        p1 = endPolygon.at(0) + myEndItem.pos()
+        p1 = endPolygon.at(180) + myEndItem.pos()
 
         intersectPoint = QtCore.QPointF()
         for i in endPolygon:
@@ -189,8 +208,13 @@ class ArrowGeneralization(TotalLineDiagram):
         super(ArrowGeneralization,self).__init__(startItem,endItem,parent,scene)
 
     def isValid(self):
-        pass
-
+        if ((isinstance(self.startItem(),Actor) and \
+            isinstance(self.endItem(), Actor)) or \
+            (isinstance(self.startItem(), UseCase) and \
+            isinstance(self.endItem(), UseCase))):
+            return True
+        else: return False
+    
     def paint(self, painter, option, widget=None):
         if (self.myStartItem.collidesWithItem(self.myEndItem)):
             return
@@ -206,7 +230,7 @@ class ArrowGeneralization(TotalLineDiagram):
 
         centerLine = QtCore.QLineF(myStartItem.pos(), myEndItem.pos())
         endPolygon = myEndItem.polygon()
-        p1 = endPolygon.at(0) + myEndItem.pos()
+        p1 = endPolygon.at(180) + myEndItem.pos()
 
         intersectPoint = QtCore.QPointF()
         for i in endPolygon:
@@ -259,6 +283,8 @@ class ElementDiagramm(QtGui.QGraphicsTextItem):
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable)
         self.myTypeElement = ElementDiagramm.NoneType
 
+        self.arrows = []
+
     def itemChange(self, change, value):
         if change == QtGui.QGraphicsItem.ItemSelectedChange:
             self.selectedChange.emit(self)
@@ -274,11 +300,15 @@ class ElementDiagramm(QtGui.QGraphicsTextItem):
             self.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
         super(ElementDiagramm, self).mouseDoubleClickEvent(event)
 
+
     def typeElement(self):
         return self.myTypeElement
 
     def polygon(self):
         return QtGui.QPolygonF(self.boundingRect())
+
+    def addArrow(self,item):
+        self.arrows.append(item)
 
 class Comment(ElementDiagramm):
     def __init__(self, parent=None, scene=None):
@@ -287,12 +317,24 @@ class Comment(ElementDiagramm):
 
     def paint(self, painter, option, widget=None):
         bodyRect = self.boundingRect()
-        pointStart =  QtCore.QPointF((bodyRect.topRight().x()- bodyRect.topLeft().x())*4.0/5.0,
+        pointStart =  QtCore.QPointF((bodyRect.topRight().x()- bodyRect.topLeft().x())*9.0/10.0,
 			bodyRect.topLeft().y());
         pointEnd = QtCore.QPointF(bodyRect.topRight().x(),
-			(bodyRect.bottomRight().y() - bodyRect.topRight().y())*1.0/5.0);
-        painter.drawRect(bodyRect)
+			(bodyRect.bottomRight().y() - bodyRect.topRight().y())*1.0/10.0)
+
+        linearGrad = QtGui.QLinearGradient(pointEnd, bodyRect.bottomLeft())
+
+        linearGrad.setColorAt(0, QtCore.Qt.white)
+        linearGrad.setColorAt(1, QtGui.QColor(255,130,80))
+        painter.fillRect(bodyRect,QtGui.QBrush(linearGrad))
+
+        painter.drawLine(bodyRect.topLeft(),pointStart)
+        painter.drawLine(bodyRect.topLeft(),bodyRect.bottomLeft())
+        painter.drawLine(bodyRect.bottomLeft(),bodyRect.bottomRight())
+        painter.drawLine(bodyRect.bottomRight(),pointEnd)
         painter.drawLine(pointStart,pointEnd)
+        painter.drawLine(pointStart,QtCore.QPointF(pointStart.x(),pointEnd.y()))
+        painter.drawLine(QtCore.QPointF(pointStart.x(),pointEnd.y()),pointEnd)
         super(Comment, self).paint(painter, option, widget)
     def polygon(self):
         return QtGui.QPolygonF(self.boundingRect())
@@ -386,42 +428,19 @@ class DiagramScene(QtGui.QGraphicsScene):
     def mousePressEvent(self, mouseEvent):
         if (mouseEvent.button() != QtCore.Qt.LeftButton):
             return
-
-        if self.myMode == self.InsertItem  :
-            item = ElementDiagramm(self.myItemType, self.myItemMenu)
-            item.setBrush(self.myItemColor)
-            self.addItem(item)
-            item.setPos(mouseEvent.scenePos())
-            self.itemInserted.emit(item)
-        elif self.myMode == self.InsertArrowAssociation or self.myMode == self.InsertArrowGeneralization or self.myMode == self.InsertCommentLine:
+        if self.myMode == self.InsertArrowAssociation or self.myMode == self.InsertArrowGeneralization or self.myMode == self.InsertCommentLine:
             self.line = QtGui.QGraphicsLineItem(QtCore.QLineF(mouseEvent.scenePos(),
                                         mouseEvent.scenePos()))
             self.line.setPen(QtGui.QPen(self.myLineColor, 2))
             self.addItem(self.line)
         elif self.myMode == self.InsertText:
             textItem = Comment()
-            textItem.setFont(self.myFont)
-            textItem.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
-            textItem.setZValue(1000.0)
-            textItem.lostFocus.connect(self.editorLostFocus)
-            textItem.selectedChange.connect(self.itemSelected)
-            self.addItem(textItem)
-            textItem.setDefaultTextColor(self.myTextColor)
-            textItem.setPos(mouseEvent.scenePos())
-            self.textInserted.emit(textItem)
         elif self.myMode == self.InsertUseCase:
             textItem = UseCase()
-            textItem.setFont(self.myFont)
-            textItem.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
-            textItem.setZValue(1000.0)
-            textItem.lostFocus.connect(self.editorLostFocus)
-            textItem.selectedChange.connect(self.itemSelected)
-            self.addItem(textItem)
-            textItem.setDefaultTextColor(self.myTextColor)
-            textItem.setPos(mouseEvent.scenePos())
-            self.textInserted.emit(textItem)
         elif self.myMode == self.InsertActor:
             textItem = Actor()
+        if self.myMode == self.InsertText or self.myMode == self.InsertUseCase or \
+           self.myMode == self.InsertActor:
             textItem.setFont(self.myFont)
             textItem.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
             textItem.setZValue(1000.0)
@@ -431,7 +450,6 @@ class DiagramScene(QtGui.QGraphicsScene):
             textItem.setDefaultTextColor(self.myTextColor)
             textItem.setPos(mouseEvent.scenePos())
             self.textInserted.emit(textItem)
-
         super(DiagramScene, self).mousePressEvent(mouseEvent)
 
     def mouseMoveEvent(self, mouseEvent):
@@ -452,43 +470,24 @@ class DiagramScene(QtGui.QGraphicsScene):
 
             self.removeItem(self.line)
             self.line = None
+            # проверка на соотвествие правил отрисовк
             if len(startItems) and len(endItems) and \
-                    isinstance(startItems[0], Comment) and \
-                    isinstance(endItems[0], TotalLineDiagram) and \
                     startItems[0] != endItems[0]:
                 startItem = startItems[0]
                 endItem = endItems[0]
-                paintTrue = True
                 if self.myMode == self.InsertCommentLine:
                     arrow = CommentLine(startItem, endItem)
-                if paintTrue == True:
-                    arrow.setColor(self.myLineColor)
-                    arrow.setZValue(-1000.0)
-                    self.addItem(arrow)
-                    arrow.updatePosition()
-            elif len(startItems) and len(endItems) and \
-                    isinstance(startItems[0], ElementDiagramm) and \
-                    isinstance(endItems[0], ElementDiagramm) and \
-                    startItems[0] != endItems[0]:
-                startItem = startItems[0]
-                endItem = endItems[0]
-                paintTrue = True
-                if self.myMode == self.InsertArrowAssociation:
+                elif self.myMode == self.InsertArrowAssociation:
                     arrow = ArrowAssociation(startItem,endItem)
                 elif self.myMode == self.InsertArrowGeneralization:
                     arrow = ArrowGeneralization(startItem,endItem)
-                else:
-                    paintTrue = False
                 if arrow.isValid():
-                    paintTrue = True
-                # startItem.addArrow(arrow)
-                # endItem.addArrow(arrow)
-                if paintTrue == True:
                     arrow.setColor(self.myLineColor)
                     arrow.setZValue(-1000.0)
                     self.addItem(arrow)
+                    startItem.addArrow(arrow)
+                    endItem.addArrow(arrow)
                     arrow.updatePosition()
-
         self.line = None
         super(DiagramScene, self).mouseReleaseEvent(mouseEvent)
 
