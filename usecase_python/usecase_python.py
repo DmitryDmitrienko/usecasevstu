@@ -563,6 +563,26 @@ class Actor(ElementDiagramm):
         super(Actor, self).paint(painter, option, widget)
     def polygon(self):
         return QtGui.QPolygonF(self.boundingRect())
+    def focusOutEvent(self, event):
+        string=self.toPlainText()
+        string=string.encode("UTF-8")
+        imgFlag=False
+        pos=0
+        i=0
+        while i<len(string) and imgFlag!=True:
+            if ord(string[i])>127:
+                imgFlag=True
+                pos=i
+            i += 1
+        if imgFlag==False:
+            self.setHtml("<img src=\":/images/actor.png\" />"+"<p>"+string+"</p>")
+        if imgFlag==True and (pos-1)!=0:
+            if len(string)-pos-4<=0:
+                self.setHtml("<img src=\":/images/actor.png\" /><p>Actor</p>");
+            else:
+                self.setHtml("<img src=\":/images/actor.png\" />"+"<p>"+string[pos+4:]+"</p>")
+        self.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
+        self.lostFocus.emit(self)
 
 class DiagramScene(QtGui.QGraphicsScene):
     InsertItem, InsertLine, InsertText, MoveItem,InsertCommentLine,InsertUseCase,InsertArrowAssociation,InsertArrowGeneralization,InsertActor  = range(9)
@@ -650,6 +670,7 @@ class DiagramScene(QtGui.QGraphicsScene):
             textItem.setZValue(1000.0)
             textItem.lostFocus.connect(self.editorLostFocus)
             textItem.selectedChange.connect(self.itemSelected)
+            textItem.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
             self.addItem(textItem)
             textItem.setDefaultTextColor(self.myTextColor)
             textItem.setPos(mouseEvent.scenePos())
