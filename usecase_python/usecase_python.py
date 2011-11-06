@@ -896,6 +896,7 @@ class MainWindow(QtGui.QMainWindow):
         self.useCaseAction.setChecked(False)
         self.commentAction.setChecked(False)
         self.actorAction.setChecked(False)
+        self.picAction.setChecked(False)
         self.pointer.setChecked(False)
     def deleteItem(self):
         for item in self.scene.selectedItems():
@@ -1010,6 +1011,11 @@ class MainWindow(QtGui.QMainWindow):
                 self,triggered = self.toComment
         )
         self.commentAction.setCheckable(True)
+        self.picAction = QtGui.QAction(
+                QtGui.QIcon(':/images/pic.png'), unicode("Изображение"),
+                self,triggered = self.toPic
+        )
+        self.picAction.setCheckable(True)
         self.pointer = QtGui.QAction(
                 QtGui.QIcon(':/images/pointer.png'), unicode("Выбрать"),
                 self,triggered = self.toPointer
@@ -1086,7 +1092,7 @@ class MainWindow(QtGui.QMainWindow):
     def toSaveAsAction(self):
         print("!!")
     def toSaveToPicAction(self):
-        print("!!")
+       print("!!")
     
     def toArrowTotal(self):
         self.scene.setMode(self.scene.InsertArrowAssociation)
@@ -1118,6 +1124,10 @@ class MainWindow(QtGui.QMainWindow):
         self.scene.setMode(self.scene.InsertText)
         self.falseChecked()
         self.commentAction.setChecked(True)
+    def toPic(self):
+        #self.scene.setMode(self.scene.InsertText)
+        self.falseChecked()
+        self.picAction.setChecked(True)
        
     def toPointer(self):
         self.scene.setMode(self.scene.MoveItem)
@@ -1137,6 +1147,7 @@ class MainWindow(QtGui.QMainWindow):
         self.itemMenu.addAction(self.useCaseAction)
         self.itemMenu.addAction(self.actorAction)
         self.itemMenu.addAction(self.commentAction)
+        self.itemMenu.addAction(self.picAction)
         self.itemMenu.addAction(self.arrowTotal)
         self.itemMenu.addAction(self.arrow)
         self.itemMenu.addAction(self.arrowComment)
@@ -1156,6 +1167,7 @@ class MainWindow(QtGui.QMainWindow):
         self.editToolBar.addAction(self.useCaseAction)
         self.editToolBar.addAction(self.actorAction)
         self.editToolBar.addAction(self.commentAction)
+        self.editToolBar.addAction(self.picAction)
         self.editToolBar.addAction(self.arrowTotal)
         self.editToolBar.addAction(self.arrow)
         self.editToolBar.addAction(self.arrowComment)
