@@ -714,8 +714,8 @@ class Actor(ElementDiagramm):
     def __init__(self, parent=None, scene=None):
         super(Actor, self).__init__(parent, scene)
         self.myTypeElement = DiagramScene.ActorType
-        self.setTextWidth(50);
-        self.setHtml("<img src=\":/images/actor.png\" /><p>Actor</p>");
+        self.setTextWidth(65);
+        self.setHtml("<img src=\":/images/actor1.png\" /><p>Actor</p>");
         textcursor=self.textCursor()
         textcursor.movePosition(QtGui.QTextCursor.Down,QtGui.QTextCursor.MoveAnchor,1)
         textcursor.movePosition(QtGui.QTextCursor.EndOfLine,QtGui.QTextCursor.KeepAnchor,5)
@@ -740,14 +740,14 @@ class Actor(ElementDiagramm):
             i += 1
         #если картинка не найдена вставляем ее в начало
         if imgFlag==False:
-            self.setHtml("<img src=\":/images/actor.png\" />"+"<p>"+string+"</p>")
+            self.setHtml("<img src=\":/images/actor1.png\" />"+"<p>"+string+"</p>")
         #если картинка найдена
         if imgFlag==True and (pos-1)!=0:
             #если картинка без текста
             if len(string)-pos-4<=0:
-                self.setHtml("<img src=\":/images/actor.png\" /><p>Actor</p>");
+                self.setHtml("<img src=\":/images/actor1.png\" /><p>Actor</p>");
             else:
-                self.setHtml("<img src=\":/images/actor.png\" />"+"<p>"+string[pos+4:]+"</p>")
+                self.setHtml("<img src=\":/images/actor1.png\" />"+"<p>"+string[pos+4:]+"</p>")
         self.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)        
         self.lostFocus.emit(self)
 
@@ -939,7 +939,7 @@ class MainWindow(QtGui.QMainWindow):
         self.createActions()
         self.createMenus()
         self.scene = DiagramScene(self.itemMenu)
-        self.scene.setSceneRect(QtCore.QRectF(0, 0, 5000, 5000))
+        self.scene.setSceneRect(QtCore.QRectF(0, 0, 1000, 1000))
         self.scene.itemInserted.connect(self.itemInserted)
         self.scene.textInserted.connect(self.textInserted)
         self.scene.textEndInserted.connect(self.textEndInserted)
