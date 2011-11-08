@@ -616,7 +616,8 @@ class ElementDiagramm(QtGui.QGraphicsTextItem):
         
     def itemChange(self, change, value):
         if change == QtGui.QGraphicsItem.ItemSelectedChange:
-            pass
+            for i in self.arrows:
+                i.update()
             # self.selectedChange.emit(self)
         return value
     
@@ -969,10 +970,12 @@ class DiagramScene(QtGui.QGraphicsScene):
                      arrow.updatePosition()
         else:
             curitems=self.items()
-            i=0
-            while i < len(curitems)-1:
-                curitems[i].setPos(self.checkPos(curitems[i].scenePos()))
-                i+=1
+            for item in curitems:
+                item.setPos(self.checkPos(item.scenePos()))
+                item.update()
+                if isinstance(item,ElementDiagramm):
+                    for arrow in item.arrows:
+                        arrow.updatePosition()
         self.line = None
         #после добавления элемента, переходит в состояние перетаскивания
         self.myMode = self.MoveItem
