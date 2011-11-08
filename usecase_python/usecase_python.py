@@ -332,10 +332,29 @@ class TotalLineDiagram(QtGui.QGraphicsLineItem):
     def setEndItem(self,item):
         self.myEndItem = item
         
+     def selection(self):
+        angle = math.acos(self.line().dx() / self.line().length())
+        size = 17
+        if self.line().dy() >= 0:
+            angle = (math.pi * 2) - angle
+        p1 = self.line().p1() - QtCore.QPointF(math.sin(angle + math.pi / 3) * size, math.cos(angle + math.pi / 3) * size)
+        p2 = self.line().p1() - QtCore.QPointF(math.sin(angle + math.pi - math.pi / 3) * size, math.cos(angle + math.pi - math.pi / 3) * size)
+        p3 = self.line().p2() + QtCore.QPointF(math.sin(angle + math.pi / 3) * size, math.cos(angle + math.pi / 3) * size)
+        p4 = self.line().p2() + QtCore.QPointF(math.sin(angle + math.pi - math.pi / 3) * size, math.cos(angle + math.pi - math.pi / 3) * size)
+        p = QtGui.QPolygonF()
+        p.push_back(p1)
+        p.push_back(p2)
+        p.push_back(p3)
+        p.push_back(p4)
+        p.push_back(p1)
+        return p
+
     def shape(self):
         path = super(TotalLineDiagram, self).shape()
         path.addPolygon(self.arrowHead)
+        path.addPolygon(self.selection())
         return path
+		
     def updatePosition(self):
         line = QtCore.QLineF(self.mapFromItem(self.myStartItem, 0, 0), self.mapFromItem(self.myEndItem, 0, 0))
         self.setLine(line)
