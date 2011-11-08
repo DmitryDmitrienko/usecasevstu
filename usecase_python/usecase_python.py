@@ -1,17 +1,15 @@
-#
-# coding: UTF-8
-# This is only needed for Python v2 but is harmless for Python v3.
-#import sip
-#sip.setapi('QString', 2)
-
-# проверка комментария
-import math
-
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+#                       coding: UTF-8                     #
+#     Dialite - программа для создания use case диаграмм  #
+#          Авторы: студенты группы ИВТ-460 ВолгГТУ        #
+#  Ли Е.В., Синицын А.А., Рашевский Н.М., Дмитриенко Д.В. #
+#     http://code.google.com/p/usecasevstu/ (c) 2011      #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 from PySide import QtCore, QtGui
-
-
+import math
 import diagramscene_rc
+
 # класс для элемента для хранение в файле
 class ElementData:
     def __init__(self,item=None):
@@ -760,7 +758,7 @@ class Actor(ElementDiagramm):
         super(Actor, self).__init__(parent, scene)
         self.myTypeElement = DiagramScene.ActorType
         self.setTextWidth(65);
-        self.setHtml("<img src=\":/images/actor1.png\" /><p>Actor</p>");
+        self.setHtml("<img src=\":/images/actor1.png\" /><p align=\"center\">Actor</p>");
         textcursor=self.textCursor()
         textcursor.movePosition(QtGui.QTextCursor.Down,QtGui.QTextCursor.MoveAnchor,1)
         textcursor.movePosition(QtGui.QTextCursor.EndOfLine,QtGui.QTextCursor.KeepAnchor,5)
@@ -785,14 +783,14 @@ class Actor(ElementDiagramm):
             i += 1
         #если картинка не найдена вставляем ее в начало
         if imgFlag==False:
-            self.setHtml("<img src=\":/images/actor1.png\" />"+"<p>"+string+"</p>")
+            self.setHtml("<img src=\":/images/actor1.png\" />"+"<p align=\"center\">"+string+"</p>")
         #если картинка найдена
         if imgFlag==True and (pos-1)!=0:
             #если картинка без текста
             if len(string)-pos-4<=0:
-                self.setHtml("<img src=\":/images/actor1.png\" /><p>Actor</p>");
+                self.setHtml("<img src=\":/images/actor1.png\" /><p align=\"center\">Actor</p>");
             else:
-                self.setHtml("<img src=\":/images/actor1.png\" />"+"<p>"+string[pos+4:]+"</p>")
+                self.setHtml("<img src=\":/images/actor1.png\" />"+"<p align=\"center\">"+string[pos+4:]+"</p>")
         self.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)        
         self.lostFocus.emit(self)
 
