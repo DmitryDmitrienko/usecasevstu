@@ -804,6 +804,7 @@ class DiagramScene(QtGui.QGraphicsScene):
 
     itemSelected = QtCore.Signal(QtGui.QGraphicsItem)
     textEndInserted = QtCore.Signal()
+    diagramChanged = QtCore.Signal()
 
     elements = []
     Arrows = []
@@ -929,7 +930,6 @@ class DiagramScene(QtGui.QGraphicsScene):
             itemSize = textItem.boundingRect()
             if isinstance(textItem,ElementDiagramm):
                 textItem.setPos(self.checkPos(mouseEvent.scenePos(),itemSize.height(),itemSize.width()))
-            #self.changeFlag=True
             # увеличиваем идентификатор
             self.Id = self.Id + 1
             textItem.setId(self.Id)
@@ -939,7 +939,7 @@ class DiagramScene(QtGui.QGraphicsScene):
         
     def addPicture(self,fString):
         pic = PictureElement(fString)
-        self.changeFlag=True
+        self.diagramChanged.emit()
         #pic.selectedChange.connect(self.itemSelected)
         pic.setPos(QtCore.QPointF(0,0))
         self.Id = self.Id+1
@@ -952,7 +952,6 @@ class DiagramScene(QtGui.QGraphicsScene):
             self.line.setLine(newLine)
         elif self.myMode == self.MoveItem:           
             super(DiagramScene, self).mouseMoveEvent(mouseEvent)
-        #self.changeFlag=True
         self.update()
 
     def getElements(self):
@@ -1009,13 +1008,12 @@ class DiagramScene(QtGui.QGraphicsScene):
         self.myMode = self.MoveItem
         self.textEndInserted.emit()
         super(DiagramScene, self).mouseReleaseEvent(mouseEvent)
-        self.changeFlag=True
+        self.diagramChanged.emit()
         self.update()
 
     def isItemChange(self, type):
         for item in self.selectedItems():
             if isinstance(item, type):
-                #self.changeFlag=True
                 return True
         return False
     def getChangeFlag(self):
@@ -1038,6 +1036,7 @@ class MainWindow(QtGui.QMainWindow):
         self.scene.itemInserted.connect(self.itemInserted)
         self.scene.textInserted.connect(self.textInserted)
         self.scene.textEndInserted.connect(self.textEndInserted)
+        self.scene.diagramChanged.connect(self.diagramChanged)
         self.scene.itemSelected.connect(self.itemSelected)
         self.createToolbars()
 
@@ -1128,7 +1127,12 @@ class MainWindow(QtGui.QMainWindow):
     def textEndInserted(self):
         self.falseChecked()
         self.pointer.setChecked(True)
-
+    def diagramChanged(self):
+        self.scene.setChangeFlag(True)
+        if self.currentFileName != "":
+            self.setWindowTitle(unicode("UseCaseDiagram - " + self.currentFileName + " *","UTF-8"))
+        else:
+             self.setWindowTitle(unicode("UseCaseDiagram - Диаграмма *","UTF-8"))           
     def sceneScaleChanged(self, scale):
         newScale = int(scale[:-1]) / 100.0
         oldMatrix = self.view.matrix()
