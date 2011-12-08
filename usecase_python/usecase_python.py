@@ -1448,6 +1448,7 @@ class DiagramScene(QtGui.QGraphicsScene):
                             c.doCopy = False
                             item.doCopy = False
                             self.initTextItem(c, item.scenePos())
+                            item.setZValue(item.zValue()+1)
                             c.setSelected(False)
                             self.doMove = False
                             itemElement.update({item.getId():c.getId()})
