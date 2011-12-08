@@ -1434,9 +1434,10 @@ class DiagramScene(QtGui.QGraphicsScene):
                 self.line.setLine(newLine)
             elif self.myMode == self.MoveItem:
                 if mouseEvent.modifiers() == QtCore.Qt.AltModifier and self.doMove == True:   
-                    items = self.selectedItems()
-                    items.sort()
-                    for item in items:
+                    itemsArrow = []
+                    itemElement =  {}
+                    # сначало копируем все элементы
+                    for item in self.selectedItems():
                         if isinstance(item, ElementDiagramm):
                             c = item.copy()
                             c.doCopy = False
@@ -1444,30 +1445,22 @@ class DiagramScene(QtGui.QGraphicsScene):
                             self.initTextItem(c, item.scenePos())
                             c.setSelected(False)
                             self.doMove = False
+                            itemElement.update({item.getId():c.getId()})
                         elif isinstance(item, TotalLineDiagram):
                             if item.startItem().isSelected() and item.endItem().isSelected():
-                                c = item.copy()
-                                itemS = None
-                                itemE = None
-                                for i in self.selectedItems(item.startItem().boundingRect()):
-                                    if item.startItem() != i and isinstance(i, ElementDiagramm):
-                                        itemS = i
-                                        break
-                                for i in self.selectedItems(item.endItem().boundingRect()):
-                                    if item.endItem() != i and isinstance(i, ElementDiagramm):
-                                        itemE = i
-                                        break
-                                if itemE!=None and itemS!=None:
-                                    self.initArrow(c)
-                                    c.setSelected(False)
-                                    c.setStartItem(itemS)
-                                    c.setEndItem(itemE)
-                                    self.addItem(c)
-                                    self.Arrows.append(c)
-                                    arrow.updatePosition()
-                                    self.diagramChanged.emit()
-                                    self.doMove = False
-                                    
+                                itemsArrow.append(item)
+                    for arr in itemsArrow:
+                        c = arr.copy()
+                        c.setStartItem(self.getElementsById(itemElement[arr.startItem().getId()]))
+                        c.setEndItem(self.getElementsById(itemElement[arr.endItem().getId()]))
+                        self.initArrow(c)
+                        self.addItem(c)
+                        self.Arrows.append(c)
+                        c.setSelected(False)
+                        arr.setSelected(True)
+                        c.updatePosition()
+                        self.diagramChanged.emit()
+                        self.doMove = False
                 super(DiagramScene, self).mouseMoveEvent(mouseEvent)
             self.update()
 
