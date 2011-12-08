@@ -31,7 +31,8 @@ class ElementData:
         stream.writeUInt32(self.id)
         stream = stream.__lshift__ (self.point)
         if(self.type == DiagramScene.CommentLineType or self.type == DiagramScene.ArrowAssociationType or \
-           self.type == DiagramScene.ArrowGeneralizationType):
+           self.type == DiagramScene.ArrowGeneralizationType or self.type == DiagramScene.ArrowAgregationType or \
+           self.type == DiagramScene.ArrowExtendType or self.type == DiagramScene.ArrowIncludeType):
             stream.writeUInt32 (self.idStart)
             stream.writeUInt32 (self.idEnd)
         elif(self.type == DiagramScene.PictureType):
@@ -56,14 +57,21 @@ class ElementData:
                 item = UseCase()
             str = stream.readString()
             item.setPlainText(str)
-        if type == DiagramScene.CommentLineType or type == DiagramScene.ArrowAssociationType \
-                or type == DiagramScene.ArrowGeneralizationType:
+        if type == DiagramScene.CommentLineType or type == DiagramScene.ArrowAssociationType or \
+           type == DiagramScene.ArrowGeneralizationType or type == DiagramScene.ArrowAgregationType or \
+           type == DiagramScene.ArrowExtendType or type == DiagramScene.ArrowIncludeType:
             if type == DiagramScene.CommentLineType:
                 item = CommentLine()
             elif type == DiagramScene.ArrowAssociationType:
                 item = ArrowAssociation()
             elif type == DiagramScene.ArrowGeneralizationType:
                 item = ArrowGeneralization()
+            elif type == DiagramScene.ArrowAgregationType:
+                item = ArrowAgregation()
+            elif type == DiagramScene.ArrowExtendType:
+                item = ArrowExtend()
+            elif type == DiagramScene.ArrowIncludeType:
+                item = ArrowInclude()
             idStart = stream.readInt32()
             idEnd = stream.readInt32()
             item.setIdStart(idStart)
@@ -85,14 +93,21 @@ class ElementData:
             elif self.type == DiagramScene.UseCaseType:
                 item = UseCase()
             item.setPlainText(self.text)
-        if self.type == DiagramScene.CommentLineType or self.type == DiagramScene.ArrowAssociationType \
-                or self.type == DiagramScene.ArrowGeneralizationType:
+        if self.type == DiagramScene.CommentLineType or self.type == DiagramScene.ArrowAssociationType or \
+           self.type == DiagramScene.ArrowGeneralizationType or self.type == DiagramScene.ArrowAgregationType or \
+           self.type == DiagramScene.ArrowExtendType or self.type == DiagramScene.ArrowIncludeType:
             if self.type == DiagramScene.CommentLineType:
                 item = CommentLine()
             elif self.type == DiagramScene.ArrowAssociationType:
                 item = ArrowAssociation()
             elif self.type == DiagramScene.ArrowGeneralizationType:
                 item = ArrowGeneralization()
+            elif self.type == DiagramScene.ArrowGeneralizationType:
+                item = ArrowAgregation()
+            elif self.type == DiagramScene.ArrowGeneralizationType:
+                item = ArrowExtend()
+            elif self.type == DiagramScene.ArrowGeneralizationType:
+                item = ArrowInclude()
             item.setIdStart(self.idStart)
             item.setIdEnd(self.idEnd)
         if self.type == DiagramScene.PictureType:
