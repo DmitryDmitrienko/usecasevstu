@@ -2094,29 +2094,43 @@ class MainWindow(QtGui.QMainWindow):
         msgBox.setText(unicode("Файл был изменен.\nХотите сохранить изменения?","UTF-8"))
         msgBox.setIcon(QtGui.QMessageBox.Question)
         saveButton = QtGui.QPushButton()
-        saveButton = msgBox.addButton(unicode("Сохранить","UTF-8"),QtGui.QMessageBox.YesRole)
+        saveButton = msgBox.addButton(unicode("Сохранить","UTF-8"),QtGui.QMessageBox.AcceptRole)
         cancelButton = QtGui.QPushButton()
-        cancelButton = msgBox.addButton(unicode("Не сохранять","UTF-8"),QtGui.QMessageBox.NoRole)
+        cancelButton = msgBox.addButton(unicode("Не сохранять","UTF-8"),QtGui.QMessageBox.RejectRole)
+        discardButton = QtGui.QPushButton()
+        discardButton = msgBox.addButton(unicode("Отменить","UTF-8"),QtGui.QMessageBox.DestructiveRole)
         msgBox.exec_()
+        return msgBox.buttonRole(msgBox.clickedButton())
         #msgBox..exec()
-        if msgBox.clickedButton()==saveButton :
-            return True
-        else:
-            return False
+        #if msgBox.clickedButton()==saveButton :
+        #    return True
+        #else:
+        #    return Fals
+
     def closeEvent(self,event):
-        if self.scene.getChangeFlag()==True and self.askSaveMessage()==True:
-            if self.currentFileName:
-                self.toSave(self.currentFileName)
+        if self.scene.getChangeFlag()==True:
+            messFlag = self.askSaveMessage()
+            if messFlag != QtGui.QMessageBox.DestructiveRole:
+                if messFlag==QtGui.QMessageBox.AcceptRole:
+                    if self.currentFileName:
+                        self.toSave(self.currentFileName)
+                    else:
+                        self.toSaveAsAction()
+                super(MainWindow, self).closeEvent(event)
             else:
-                self.toSaveAsAction()
-        super(MainWindow, self).closeEvent(event)
-        
+                event.ignore()
     def toCreateAction(self):
-        if self.scene.getChangeFlag()==True and self.askSaveMessage()==True :
-            if self.currentFileName:
-                self.toSave(self.currentFileName)
+        if self.scene.getChangeFlag()==True:
+            messFlag = self.askSaveMessage()
+            if messFlag!= QtGui.QMessageBox.DestructiveRole:
+                if messFlag == QtGui.QMessageBox.AcceptRole:
+                    if self.currentFileName:
+                        self.toSave(self.currentFileName)
+                    else:
+                        self.toSaveAsAction()
             else:
-                self.toSaveAsAction()
+                return
+        self.toPointer()
         self.clearAll()
         self.scene.addRect(0.0,0.0, self.scene.widthWorkPlace, self.scene.heightWorkPlace,QtGui.QPen(QtGui.QBrush(QtGui.QColor(0,0,0,255)),4.0),QtGui.QBrush(QtGui.QColor(255,255,255,255)))
         self.currentFileName=""
@@ -2125,8 +2139,16 @@ class MainWindow(QtGui.QMainWindow):
         self.cleanScenesElements()
         self.saveScenesElements()
     def toOpenAction(self):
-        if self.scene.getChangeFlag()==True and self.askSaveMessage()==True:
-            self.toSaveAsAction()
+        if self.scene.getChangeFlag()==True:
+            messFlag = self.askSaveMessage()
+            if messFlag!= QtGui.QMessageBox.DestructiveRole:
+                if messFlag == QtGui.QMessageBox.AcceptRole:
+                    if self.currentFileName:
+                        self.toSave(self.currentFileName)
+                    else:
+                        self.toSaveAsAction()
+            else:
+                return
         fileName,other=QtGui.QFileDialog.getOpenFileName(self,unicode("Открыть файл","UTF-8"),unicode(""),unicode("Use case by CommandBrain (*.vox)"))
         if fileName:
             self.clearAll()
