@@ -1,4 +1,15 @@
-usecasevstu
+Редактор UseCase диаграмм созданный студентами [ВолгГТУ](http://www.vstu.ru "ВолгГТУ")
 ===========
 
-UseCase editor by vstu.ru student 
+![Alt text](http://wiki.poas.vstu.ru/poas_logo.png "Кафедра ПОАС")
+
+Программа для создание use case диаграмм определенного вида.
+
+Разработчики студенты гр. ИВТ-460:
+ * Дмитриенко Д.В - ведущий программист.
+ * Рашевский Н.М  - тестирование,разработка,главный менеджер :)
+ * Синицын А.А  - тестирование,разработка и кодирование сложных алгоритмов.
+ * Ли Е.В - тестирование,разработка,главный дизайнер.
+
+<br><wiki:video url ="http://www.youtube.com/watch?v=99GF7nHbwYA"/>
+[![Видео о использовании программы](https://dl.dropboxusercontent.com/u/8820886/blog/usecasegit.png)](http://www.youtube.com/watch?v=99GF7nHbwYA)
